@@ -10,10 +10,11 @@ const storage = multer.diskStorage({
 });
 const upload = multer({ storage });
 
-router.post('/register', upload.single('avatar'), authController.register);
 
+router.post('/register', upload.single('avatar'), authController.register);
+router.get('/verify-email', authController.verifyEmail);
 
 router.post('/login', authController.login);
-
+router.post("/refresh", authController.refresh);
 
 module.exports = router;

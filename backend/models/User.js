@@ -2,6 +2,11 @@ const { DataTypes } = require('sequelize');
 const sequelize = require('../config/db');
 
 const User = sequelize.define('User', {
+   id: {
+    type: DataTypes.INTEGER,
+    primaryKey: true,
+    autoIncrement: true
+  },
   name: {
     type: DataTypes.STRING,
     allowNull: false
@@ -16,7 +21,7 @@ const User = sequelize.define('User', {
     allowNull: false
   },
   profileImage: {
-    type: DataTypes.STRING // store file path or URL
+    type: DataTypes.STRING
   },
   isVerified: {
     type: DataTypes.BOOLEAN,
@@ -24,7 +29,11 @@ const User = sequelize.define('User', {
   },
   verificationToken: {
     type: DataTypes.STRING
-  }
+  },
+   role: {
+    type: DataTypes.ENUM("user", "admin"),
+    defaultValue: "user",
+  },
 });
 
 module.exports = User;
