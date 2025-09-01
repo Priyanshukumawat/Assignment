@@ -138,6 +138,62 @@ exports.login = async (req, res) => {
   }
 };
 
+// Forgot Password
+exports.forgotPassword = async (req, res) => {
+  try {
+    const { email } = req.body;
+    const user = await User.findOne({ where: { email } }); // Sequelize syntax
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    // Generate reset token (15m expiry)
+    const resetToken = jwt.sign(
+      { id: user.id },
+      process.env.JWT_ACCESS_SECRET || "my_super_secret_access_key",
+      { expiresIn: "15m" }
+    );
+
+    const resetUrl = `http://localhost:3000/reset-password/${resetToken}`;
+
+    // Reuse sendEmail util ✅
+    await sendEmail(
+      user.email,
+      "Password Reset",
+      resetUrl
+    );
+
+    res.json({ message: "Password reset email sent" });
+  } catch (err) {
+    console.error("Forgot password error:", err);
+    res.status(500).json({ message: "Error sending reset email" });
+  }
+};
+
+// Reset Password
+exports.resetPassword = async (req, res) => {
+  try {
+    const { token } = req.params;
+    const { password } = req.body;
+
+    const decoded = jwt.verify(
+      token,
+      process.env.JWT_ACCESS_SECRET || "my_super_secret_access_key"
+    );
+
+    const user = await User.findByPk(decoded.id); // ✅ Sequelize syntax
+    if (!user) return res.status(400).json({ message: "Invalid token or user not found" });
+
+    // Hash new password
+    const hashedPassword = await bcrypt.hash(password, 10);
+    user.password = hashedPassword;
+    await user.save();
+
+    res.json({ message: "Password reset successful" });
+  } catch (err) {
+    console.error("Reset password error:", err);
+    res.status(500).json({ message: "Invalid or expired token" });
+  }
+};
+
 
 exports.refresh = async (req, res) => {
   const { refreshToken } = req.body;

@@ -1,13 +1,52 @@
 const User = require('../models/User');
 
 exports.getAllUsers = async (req, res) => {
-  const users = await User.findAll();
-  res.json(users);
+  try {
+    const users = await User.findAll({
+      attributes: { exclude: ["password"] }
+    });
+    res.json(users);
+  } catch (err) {
+    console.error("Error fetching users:", err);
+    res.status(500).json({ message: "Server error while fetching users" });
+  }
 };
 
 exports.createUser = async (req, res) => {
-  const user = await User.create(req.body);
-  res.json(user);
+  try {
+    const user = await User.create(req.body);
+    res.json(user);
+  } catch (err) {
+    console.error("Error creating user:", err);
+    res.status(500).json({ message: "Server error while creating user" });
+  }
+};
+
+
+
+exports.searchUsers = async (req, res) => {
+  try {
+    const { q } = req.query;
+
+    if (!q || q.trim() === "") {
+      return res.status(400).json({ message: "Search query is required" });
+    }
+
+    const users = await User.findAll({
+      where: {
+        [require("sequelize").Op.or]: [
+          { name: { [require("sequelize").Op.like]: `%${q}%` } },
+          { email: { [require("sequelize").Op.like]: `%${q}%` } }
+        ]
+      },
+      attributes: { exclude: ["password"] }
+    });
+
+    res.json(users);
+  } catch (err) {
+    console.error("Error searching users:", err);
+    res.status(500).json({ message: "Server error while searching users" });
+  }
 };
 
 exports.updateUser = async (req, res) => {
