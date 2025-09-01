@@ -19,12 +19,15 @@ app.use(cors({
 }));
 
 app.use(express.json());
-app.use("/uploads", express.static(path.join(__dirname, "uploads"))); // serve uploaded files
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
+
+
 
 // Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/user', userRoutes);
+
 
 
 // Test DB and start server

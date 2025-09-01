@@ -13,23 +13,6 @@ exports.getAllUsers = async (req, res) => {
   }
 };
 
-// exports.getAllUsers = async (req, res) => {
-// try {
-//     // only allow admin to fetch users
-//     if (req.user.role !== "admin") {
-//       return res.status(403).json({ message: "Access denied. Admins only." });
-//     }
-
-//     const users = await User.findAll({
-//       attributes: ["id", "name", "email", "role", "isVerified", "createdAt"],
-//     });
-
-//     res.json(users);
-//   } catch (err) {
-//     console.error("Error fetching users:", err);
-//     res.status(500).json({ message: "Server error while fetching users" });
-//   }
-// };
 
 exports.deleteUser = async (req, res) => {
   try {
